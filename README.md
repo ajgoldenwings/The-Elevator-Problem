@@ -19,6 +19,9 @@ Or follow the [getting started documentation](https://docs.microsoft.com/en-us/a
 - If deleting entities with entities within them, god help us all on how it was handled.
 - Pretty pictures are available within this directory.
 
+![Elevator Simulation Picture 1](/picture1.png)
+![Elevator Simulation Picture 2](/picture2.png)
+
 ## Technical Challenges
 - May take time to respond to a requesting passenger. Currently it looks to see if there is at least one passenger that exists and sends on elevator per direction. Does not send multiple. Does not take into account for cost over time for power.
 - Not efficient if running large datasets.
