@@ -1,0 +1,16 @@
+﻿
+<div class="card text-white bg-warning mb-2">
+    <div class="card-header">Passenger @PassengerModel.Id</div>
+    <div class="card-body text-muted py-1">
+        <p class="card-text">
+            <small>Requested Floor: @PassengerModel.RequestedFloor.Id</small><br />
+            <small>Wait Time: @PassengerModel.WaitTime</small>
+        </p>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PassengerModel PassengerModel { get; set; }
+}
+

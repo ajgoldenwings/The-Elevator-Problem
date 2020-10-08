@@ -1,0 +1,393 @@
+﻿@page "/elevatorproblem"
+@inject IJSRuntime JsRuntime;
+
+@if (Simulating)
+{
+    <div class="alert alert-warning">
+        Simulation is Currently Running
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-primary">
+        Simulation is Currently Paused
+    </div>
+}
+
+<div class="card-columns">
+    <div class="card mb-2">
+        <div class="card-body">
+            <p class="card-text">
+                Passenger count: @Passengers.Count
+            </p>
+        </div>
+    </div>
+    <div class="card mb-2">
+        <div class="card-body">
+            <p class="card-text">
+                Total Units of Time Passed: @TotalTimePassed
+            </p>
+        </div>
+    </div>
+    <div class="card mb-2">
+        <div class="card-body">
+            <p class="card-text">
+                Total Units of Time Waited: @Passengers.Sum(i => i.WaitTime)
+            </p>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <p class="card-text">
+                Power Consumed (floor changes): @PowerConsumed
+            </p>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <p class="card-text">
+                Average Wait Time: @Math.Round(Passengers.Count != 0 ? ((double)Passengers.Sum(i => i.WaitTime) / Passengers.Count) : 0, 2)
+            </p>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <p class="card-text">
+                Average Power Consumed Per Unit of Time: @Math.Round(TotalTimePassed != 0 ? ((double)PowerConsumed / TotalTimePassed) : 0, 2)
+            </p>
+        </div>
+    </div>
+</div>
+<div class="card-columns">
+    <NewPassengerProbabilityCard @bind-Probability="NewPassengerProbability"
+                                 @bind-Probability:event="ProbabilityChanged" />
+    <div class="card mb-3">
+        <div class="card-body">
+            <p class="card-text">
+                Speed:<br />
+                @if (NormalSpeed)
+                {
+                    <button type="button" class="btn btn-primary" @onclick="ToggleSpeed">Normal Speed</button>
+                    <button type="button" class="btn btn-secondary" @onclick="ToggleSpeed">Full Speed</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-secondary" @onclick="ToggleSpeed">Normal Speed</button>
+                    <button type="button" class="btn btn-danger" @onclick="ToggleSpeed">Full Speed</button>
+                }
+            </p>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-primary" @onclick="AddElevator">Add Elevator</button>
+
+<button class="btn btn-dark" @onclick="AddFloor">Add a Floor</button>
+
+@if (Floors.Count > 1)
+{
+    <button class="btn btn-dark" @onclick="RemoveFloor">Remove top Floor</button>
+}
+
+@if (Simulating)
+{
+    <button type="button" class="btn btn-warning" @onclick="SimulateToggle">Stop Simulation</button>
+}
+else
+{
+    <button type="button" class="btn btn-danger" @onclick="SimulateToggle">Start Simulation</button>
+}
+
+<br />
+<br />
+
+<div class="card text-white bg-success mb-3">
+    <div class="card-header">Fulfilled Passengers:</div>
+    <div class="card-body">
+        <p class="card-text">
+            <div class="card-columns">
+                @foreach (PassengerModel passenger in Passengers.Where(i => i.CurrentFloor == i.RequestedFloor))
+                {
+                    <Passenger PassengerModel="passenger" />
+                }
+            </div>
+        </p>
+    </div>
+</div>
+
+@foreach (FloorModel floor in Floors.OrderByDescending(i => i.Id))
+{
+    <Floor FloorModel="floor"
+           Elevators="Elevators.Where(i => i.CurrentFloor == floor).ToList()"
+           Passengers="Passengers.Where(i => i.CurrentFloor == floor && i.CurrentFloor != i.RequestedFloor).ToList()"
+           DeleteElevator="DeleteElevator" />
+}
+
+@code {
+    List<FloorModel> Floors = new List<FloorModel>();
+    List<ElevatorModel> Elevators = new List<ElevatorModel>();
+    List<PassengerModel> Passengers = new List<PassengerModel>();
+
+    int NewPassengerProbability { get; set; } = 50;
+
+    Random random = new Random((int)DateTime.Now.Ticks);
+    int TotalTimePassed = 0;
+    int PowerConsumed = 0;
+    bool Simulating = false;
+    bool NormalSpeed = true;
+
+    protected override void OnInitialized()
+    {
+        // Initialize with ten Floor
+        Enumerable.Range(0, 10).ToList().ForEach(_ => AddFloor());
+
+        // Initialize with three Elevator
+        Enumerable.Range(0, 3).ToList().ForEach(_ => AddElevator());
+    }
+
+    void SimulateToggle()
+    {
+        Simulating = Simulating ? false : true;
+
+        StateHasChanged();
+
+        if (Simulating)
+        {
+            RunSimulation();
+        }
+    }
+
+    private void ToggleSpeed()
+    {
+        NormalSpeed = NormalSpeed ? false : true;
+
+        StateHasChanged();
+    }
+
+    public async void RunSimulation()
+    {
+        while (Simulating)
+        {
+            SimulateAddPassenger();
+
+            SimulatePassengersEnter();
+
+            SimulatePassengersExit();
+
+            SimulateMoveElevators();
+
+            // Increment Passenger Wait Time
+            Passengers.Where(i => i.CurrentFloor != i.RequestedFloor).ToList().ForEach(i => i.IncrementWaitTime());
+
+            TotalTimePassed++;
+
+            StateHasChanged();
+
+            // Wait 1 second (normal speed)
+            // Will need to wait outside WASM and within the browsers js engine.
+            // Blazor does not yet support threading and will not be that efficient.
+            int a = await JsRuntime.InvokeAsync<int>("JsInteropWaitFunction", new object[] { NormalSpeed ? "1000" : "100" });
+        }
+    }
+
+    void SimulateMoveElevators()
+    {
+        // For Each Floor that has waiting passengers
+        foreach (FloorModel floorModel in Floors)
+        {
+            if (Passengers.Where(i => i.CurrentFloor != i.RequestedFloor && i.CurrentFloor == floorModel && i.CurrentElevator == null).Any())
+            {
+                // Search for an elevator that is moving torwards it
+                if (Elevators.Where(
+                    i => (i.CurrentDirection == CurrentDirection.Down && i.CurrentFloor.Id > floorModel.Id)
+                    || (i.CurrentDirection == CurrentDirection.Up && i.CurrentFloor.Id < floorModel.Id)).Any())
+                {
+                    continue;
+                }
+
+                // Send for an elevator that is closest waiting
+                FloorModel floorAbove = floorModel;
+                FloorModel floorBelow = floorModel;
+                ElevatorModel elevatorModel = null;
+                do
+                {
+                    if (floorAbove != null)
+                        floorAbove = Floors.Where(i => i.Id == floorAbove.Id + 1).FirstOrDefault();
+                    if (floorBelow != null)
+                        floorBelow = Floors.Where(i => i.Id == floorBelow.Id - 1).FirstOrDefault();
+
+                    if (floorAbove != null)
+                    {
+                        elevatorModel = Elevators.Where(
+                            i => i.CurrentFloor == floorAbove && i.CurrentDirection == CurrentDirection.Wait).FirstOrDefault();
+
+                        if (elevatorModel != null)
+                        {
+                            elevatorModel.CurrentDirection = CurrentDirection.Down;
+                            continue;
+                        }
+                    }
+                    if (floorBelow != null)
+                    {
+                        elevatorModel = Elevators.Where(
+                            i => i.CurrentFloor == floorBelow && i.CurrentDirection == CurrentDirection.Wait).FirstOrDefault();
+
+                        if (elevatorModel != null)
+                        {
+                            elevatorModel.CurrentDirection = CurrentDirection.Up;
+                            continue;
+                        }
+                    }
+                } while ((floorAbove != null || floorBelow != null) && elevatorModel == null);
+            }
+        }
+
+        foreach (ElevatorModel elevatorModel in Elevators)
+        {
+            CurrentDirection currentDirection = elevatorModel.CurrentDirection;
+
+            switch (currentDirection)
+            {
+                case CurrentDirection.Wait:
+                    break;
+                case CurrentDirection.Up:
+                    elevatorModel.CurrentFloor = Floors.Where(i => i.Id == elevatorModel.CurrentFloor.Id + 1).First();
+                    Passengers.Where(i => i.CurrentElevator == elevatorModel).ToList().ForEach(i => i.CurrentFloor = elevatorModel.CurrentFloor);
+                    PowerConsumed++;
+                    break;
+                case CurrentDirection.Down:
+                    elevatorModel.CurrentFloor = Floors.Where(i => i.Id == elevatorModel.CurrentFloor.Id - 1).First();
+                    Passengers.Where(i => i.CurrentElevator == elevatorModel).ToList().ForEach(i => i.CurrentFloor = elevatorModel.CurrentFloor);
+                    PowerConsumed++;
+                    break;
+            }
+        }
+    }
+
+    void SimulateAddPassenger()
+    {
+        if (NewPassengerProbability > random.Next(0, 99))
+        {
+            AddPassenger();
+        }
+    }
+
+    void SimulatePassengersEnter()
+    {
+        foreach (ElevatorModel elevatorModel in Elevators)
+        {
+            CurrentDirection currentDirection = elevatorModel.CurrentDirection;
+
+            if (currentDirection == CurrentDirection.Wait)
+            {
+                PassengerModel passengerModel = Passengers.Where(
+                    i => i.CurrentFloor != i.RequestedFloor
+                    && i.CurrentElevator == null
+                    && i.CurrentFloor == elevatorModel.CurrentFloor).FirstOrDefault();
+                if (passengerModel != null)
+                    currentDirection
+                        = elevatorModel.CurrentDirection
+                        = (passengerModel.RequestedFloor.Id > elevatorModel.CurrentFloor.Id
+                        ? CurrentDirection.Up : CurrentDirection.Down);
+            }
+
+            switch (currentDirection)
+            {
+                case CurrentDirection.Wait:
+                    break;
+                case CurrentDirection.Up:
+                    Passengers.Where(i => i.CurrentFloor != i.RequestedFloor
+                        && i.CurrentFloor == elevatorModel.CurrentFloor
+                        && i.CurrentElevator == null
+                        && i.RequestedFloor.Id > i.CurrentFloor.Id).ToList()
+                        .ForEach(i => i.EnterElevator(elevatorModel));
+                    break;
+                case CurrentDirection.Down:
+                    Passengers.Where(i => i.CurrentFloor != i.RequestedFloor
+                        && i.CurrentFloor == elevatorModel.CurrentFloor
+                        && i.CurrentElevator == null
+                        && i.RequestedFloor.Id < i.CurrentFloor.Id).ToList()
+                        .ForEach(i => i.EnterElevator(elevatorModel));
+                    break;
+            }
+        }
+    }
+
+    void SimulatePassengersExit()
+    {
+        Passengers.Where(i => i.CurrentElevator != null && i.CurrentFloor == i.RequestedFloor).ToList().ForEach(i => i.CurrentElevator = null);
+
+        foreach (ElevatorModel elevatorModel in Elevators.Where(i => i.CurrentDirection != CurrentDirection.Wait))
+            if (!Passengers.Where(i => i.CurrentElevator == elevatorModel).Any())
+                elevatorModel.CurrentDirection = CurrentDirection.Wait;
+    }
+
+    void AddElevator()
+    {
+        var elevator = new ElevatorModel()
+        {
+            Id = Elevators.Count,
+            CurrentFloor = Floors.First()
+        };
+
+        Elevators.Add(elevator);
+
+        StateHasChanged();
+    }
+
+    void AddFloor()
+    {
+        var floor = new FloorModel()
+        {
+            Id = Floors.Count + 1
+        };
+
+        Floors.Add(floor);
+
+        StateHasChanged();
+    }
+
+    void AddPassenger()
+    {
+        // Case when there is only one floor
+        if (Floors.Count == 1) return;
+
+        int randomInt = random.Next(1, Floors.Count + 1);
+        int randomIntNew = random.Next(1, Floors.Count + 1);
+        FloorModel randomCurrentFloor = Floors.Where(i => i.Id == randomInt).First();
+        while (randomInt == randomIntNew)
+        {
+            randomIntNew = random.Next(1, Floors.Count + 1);
+        }
+        FloorModel randomRequestedFloor = Floors.Where(i => i.Id == randomIntNew).First();
+
+        var passenger = new PassengerModel()
+        {
+            Id = Passengers.Count,
+            CurrentFloor = randomCurrentFloor,
+            RequestedFloor = randomRequestedFloor
+        };
+
+        Passengers.Add(passenger);
+
+        StateHasChanged();
+    }
+
+    void RemoveFloor()
+    {
+        Floors.RemoveAt(Floors.Count - 1);
+
+        StateHasChanged();
+    }
+
+    public async Task DeleteElevator(ElevatorModel elevator)
+    {
+        Elevators.Remove(elevator);
+
+        StateHasChanged();
+    }
+}
+

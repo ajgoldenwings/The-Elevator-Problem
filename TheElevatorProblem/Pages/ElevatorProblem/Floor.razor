@@ -1,0 +1,46 @@
+﻿
+<div class="card-group">
+    <div class="card text-white bg-dark mb-2">
+        <div class="card-header">Floor @FloorModel.Id</div>
+        <div class="card-body">
+            <p class="card-text">
+                <div class="card-columns">
+                    @foreach (ElevatorModel elevator in Elevators)
+                    {
+                        <Elevator Passengers="Passengers.Where(i => i.CurrentElevator == elevator).ToList()" 
+                                  ElevatorModel="elevator" 
+                                  DeleteElevator="DeleteElevator" />
+                    }
+                </div>
+            </p>
+        </div>
+    </div>
+    <div class="card text-white bg-dark mb-2">
+        <div class="card-header">Waiting Passengers:</div>
+        <div class="card-body">
+            <p class="card-text">
+                <div class="card-columns">
+                    @foreach (PassengerModel passenger in Passengers.Where(i => i.CurrentElevator == null))
+                    {
+                        <Passenger PassengerModel="passenger" />
+                    }
+                </div>
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public FloorModel FloorModel { get; set; }
+
+    [Parameter]
+    public List<ElevatorModel> Elevators { get; set; }
+
+    [Parameter]
+    public List<PassengerModel> Passengers { get; set; }
+
+    [Parameter]
+    public Func<ElevatorModel, Task> DeleteElevator { get; set; }
+}
+
