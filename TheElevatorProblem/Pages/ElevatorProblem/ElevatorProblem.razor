@@ -148,26 +148,26 @@ else
         Enumerable.Range(0, 3).ToList().ForEach(_ => AddElevator());
     }
 
-    void SimulateToggle()
+    async void SimulateToggle()
     {
-        Simulating = Simulating ? false : true;
+        Simulating = !Simulating;
 
         StateHasChanged();
 
         if (Simulating)
         {
-            RunSimulation();
+            await RunSimulation();
         }
     }
 
     private void ToggleSpeed()
     {
-        NormalSpeed = NormalSpeed ? false : true;
+        NormalSpeed = !NormalSpeed;
 
         StateHasChanged();
     }
 
-    public async void RunSimulation()
+    public async Task RunSimulation()
     {
         while (Simulating)
         {
@@ -187,9 +187,7 @@ else
             StateHasChanged();
 
             // Wait 1 second (normal speed)
-            // Will need to wait outside WASM and within the browsers js engine.
-            // Blazor does not yet support threading and will not be that efficient.
-            int a = await JsRuntime.InvokeAsync<int>("JsInteropWaitFunction", new object[] { NormalSpeed ? "1000" : "100" });
+            await Task.Delay(NormalSpeed ? 1000 : 100);
         }
     }
 

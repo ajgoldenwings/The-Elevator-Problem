@@ -1,14 +1,21 @@
 # The Elevator Problem
 
-A Blazor Server application simulating elevator operations and passenger management.
+A Blazor WebAssembly application simulating elevator operations and passenger management.
 
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later
 
+## Technology Stack
+
+- **Framework**: Blazor WebAssembly with .NET 10
+- **UI**: Bootstrap 5.3.2 (via CDN)
+- **Deployment**: GitHub Pages with GitHub Actions (auto-deploys on push to master/main)
+- **Hosting**: Client-side (runs entirely in the browser)
+
 ## Getting Started
 
-### Running the Application
+### Running the Application Locally
 
 1. Clone or download this repository
 2. Navigate to the project directory:
@@ -35,30 +42,33 @@ dotnet publish -c Release -o ./publish
 ```
 
 ## Overview
-- Main logic within TheElevatorProblem\Pages\ElevatorProblem\ElevatorProblem.razor
-- When entering the page with the list of elevators, it defaults to 10 floors and 3 elevators.
-- Floors are divided into two sections. The Left side contains elevators with passengers. The Right side contains waiting passengers.
-- Elevators start at the bottom level.
-- There are many options and statistics shown.
-- Time is measured in 'units'.
-- Power is measured in 'floor changes'.
-- New Passengers are placed on a random floor and requests a random floor.
-- If deleting entities with entities within them, god help us all on how it was handled.
-- Pretty pictures are available within this directory.
+
+- Main logic within `TheElevatorProblem/Pages/ElevatorProblem/ElevatorProblem.razor`
+- When entering the page with the list of elevators, it defaults to 10 floors and 3 elevators
+- Floors are divided into two sections:
+  - **Left side**: Elevators with passengers
+  - **Right side**: Waiting passengers
+- Elevators start at the bottom level
+- Many options and statistics are shown
+- Time is measured in 'units'
+- Power is measured in 'floor changes'
+- New passengers are placed on a random floor and request a random floor
+- Pretty pictures are available within this directory
 
 ![Elevator Simulation Picture 1](/picture1.png)
 ![Elevator Simulation Picture 2](/picture2.png)
 
 ## Technical Challenges
+
 - May take time to respond to a requesting passenger. Currently it looks to see if there is at least one passenger that exists and sends one elevator per direction. Does not send multiple. Does not take into account cost over time for power.
-- Not efficient when running large datasets.
-- As more components are rendered on screen, the slower it gets. Best suited for shorter demonstrations or fewer passengers.
+- Not efficient when running large datasets
+- As more components are rendered on screen, the slower it gets. Best suited for shorter demonstrations or fewer passengers
 
 ## Architecture
 
-- **Framework**: Blazor Server with .NET 10
+- **Framework**: Blazor WebAssembly with .NET 10
 - **UI**: Bootstrap 5.3.2 (via CDN)
-- **Hosting Model**: Minimal hosting model (modern .NET pattern)
+- **Deployment**: Automated via GitHub Actions
 - **Main Logic**: `TheElevatorProblem/Pages/ElevatorProblem/ElevatorProblem.razor`
 
 ## Known Limitations
