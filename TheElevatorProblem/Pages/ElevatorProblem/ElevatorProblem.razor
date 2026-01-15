@@ -81,10 +81,16 @@
     <div class="col-md-6 mb-2">
         <div class="card">
             <div class="card-body">
-                <small class="text-muted d-block mb-2">Speed</small>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn @(NormalSpeed ? "btn-primary" : "btn-outline-secondary")" @onclick="ToggleSpeed">Normal</button>
-                    <button type="button" class="btn @(!NormalSpeed ? "btn-danger" : "btn-outline-secondary")" @onclick="ToggleSpeed">Fast</button>
+                <small class="text-muted d-block mb-2">Simulation Speed</small>
+                <div class="d-flex justify-content-center">
+                    <div class="btn-group btn-group-lg" role="group">
+                        <button type="button" class="btn @(NormalSpeed ? "btn-primary" : "btn-outline-primary")" @onclick="() => SetSpeed(true)">
+                            <span class="oi oi-media-play"></span> Normal
+                        </button>
+                        <button type="button" class="btn @(!NormalSpeed ? "btn-danger" : "btn-outline-danger")" @onclick="() => SetSpeed(false)">
+                            <span class="oi oi-bolt"></span> Fast
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -176,10 +182,9 @@
         }
     }
 
-    private void ToggleSpeed()
+    private void SetSpeed(bool normal)
     {
-        NormalSpeed = !NormalSpeed;
-
+        NormalSpeed = normal;
         StateHasChanged();
     }
 

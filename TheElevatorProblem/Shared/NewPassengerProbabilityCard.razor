@@ -1,22 +1,21 @@
 ﻿
-<div class="card mb-3">
+<div class="card">
     <div class="card-body">
-        <p class="card-text">
-            New Passenger Probability Per Unit of Time:
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <button class="btn btn-outline-secondary" type="button" @onclick="DecrementProbability">
-                        <span class="oi oi-minus" aria-hidden="true"></span>
-                    </button>
-                </div>
-                <input type="text" class="form-control" value="@GetProbability()" readonly />
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" @onclick="IncrementProbability">
-                        <span class="oi oi-plus" aria-hidden="true"></span>
-                    </button>
-                </div>
+        <small class="text-muted d-block mb-2">New Passenger Probability</small>
+        <div class="d-flex align-items-center">
+            <button class="btn btn-outline-primary btn-sm" type="button" @onclick="DecrementProbability">
+                <span class="oi oi-minus" aria-hidden="true"></span>
+            </button>
+            <div class="flex-grow-1 text-center mx-3">
+                <h4 class="mb-0">@Probability%</h4>
             </div>
-        </p>
+            <button class="btn btn-outline-primary btn-sm" type="button" @onclick="IncrementProbability">
+                <span class="oi oi-plus" aria-hidden="true"></span>
+            </button>
+        </div>
+        <div class="mt-2">
+            <input type="range" class="form-range" min="0" max="100" step="5" @bind="Probability" @bind:event="oninput" @onchange="OnRangeChanged" />
+        </div>
     </div>
 </div>
 
@@ -27,19 +26,13 @@
     [Parameter] 
     public EventCallback<int> ProbabilityChanged { get; set; }
 
-    string GetProbability()
-    {
-        return Probability.ToString() + "%";
-    }
-
     private async Task IncrementProbability()
     {
         if (Probability < 100)
         {
             Probability += 5;
+            await ProbabilityChanged.InvokeAsync(Probability);
         }
-        
-        await ProbabilityChanged.InvokeAsync(Probability);
     }
 
     private async Task DecrementProbability()
@@ -47,8 +40,12 @@
         if (Probability > 0)
         {
             Probability -= 5;
+            await ProbabilityChanged.InvokeAsync(Probability);
         }
-        
+    }
+
+    private async Task OnRangeChanged()
+    {
         await ProbabilityChanged.InvokeAsync(Probability);
     }
 }
