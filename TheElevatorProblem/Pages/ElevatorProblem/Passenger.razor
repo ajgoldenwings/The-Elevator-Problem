@@ -1,11 +1,11 @@
 ﻿
-<div class="card text-white bg-warning mb-2">
-    <div class="card-header">Passenger @PassengerModel.Id</div>
-    <div class="card-body text-muted py-1">
-        <p class="card-text">
-            <small>Requested Floor: @PassengerModel.RequestedFloor.Id</small><br />
-            <small>Wait Time: @PassengerModel.WaitTime</small>
-        </p>
+<div class="card text-white bg-warning mb-0">
+    <div class="card-header py-1 px-2">
+        <small><strong>Passenger @PassengerModel.Id</strong></small>
+    </div>
+    <div class="card-body text-dark py-1 px-2">
+        <small class="d-block">Floor: @PassengerModel.RequestedFloor.Id</small>
+        <small class="d-block">Wait: @PassengerModel.WaitTime</small>
     </div>
 </div>
 

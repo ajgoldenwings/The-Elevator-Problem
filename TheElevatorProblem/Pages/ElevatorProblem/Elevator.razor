@@ -1,16 +1,16 @@
 ﻿
-<div class="card text-white bg-primary mb-2">
-    <div class="card-header">Elevator @ElevatorModel.Id</div>
-    <div class="card-body">
-        <p class="card-text">
+<div class="card text-white bg-primary mb-0" style="width: 180px;">
+    <div class="card-header py-1 px-2 d-flex justify-content-between align-items-center">
+        <small><strong>Elevator @ElevatorModel.Id</strong></small>
+        <button class="btn btn-danger btn-sm py-0 px-1" @onclick="Delete" style="font-size: 0.7rem;">×</button>
+    </div>
+    <div class="card-body p-2">
+        <div class="d-flex flex-column gap-1">
             @foreach (PassengerModel passenger in Passengers)
             {
                 <Passenger PassengerModel="passenger" />
             }
-        </p>
-    </div>
-    <div class="card-footer">
-        <button class="btn btn-danger" @onclick="Delete">Delete</button>
+        </div>
     </div>
 </div>
 

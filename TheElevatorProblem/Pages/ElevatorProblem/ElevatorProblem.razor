@@ -2,120 +2,135 @@
 @page "/elevatorproblem"
 @inject IJSRuntime JsRuntime;
 
-@if (Simulating)
-{
-    <div class="alert alert-warning">
-        Simulation is Currently Running
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-        </div>
-    </div>
-}
-else
-{
-    <div class="alert alert-primary">
-        Simulation is Currently Paused
-    </div>
-}
-
-<div class="card-columns">
-    <div class="card mb-2">
-        <div class="card-body">
-            <p class="card-text">
-                Passenger count: @Passengers.Count
-            </p>
-        </div>
-    </div>
-    <div class="card mb-2">
-        <div class="card-body">
-            <p class="card-text">
-                Total Units of Time Passed: @TotalTimePassed
-            </p>
-        </div>
-    </div>
-    <div class="card mb-2">
-        <div class="card-body">
-            <p class="card-text">
-                Total Units of Time Waited: @Passengers.Sum(i => i.WaitTime)
-            </p>
-        </div>
-    </div>
-    <div class="card mb-3">
-        <div class="card-body">
-            <p class="card-text">
-                Power Consumed (floor changes): @PowerConsumed
-            </p>
-        </div>
-    </div>
-    <div class="card mb-3">
-        <div class="card-body">
-            <p class="card-text">
-                Average Wait Time: @Math.Round(Passengers.Count != 0 ? ((double)Passengers.Sum(i => i.WaitTime) / Passengers.Count) : 0, 2)
-            </p>
-        </div>
-    </div>
-    <div class="card mb-3">
-        <div class="card-body">
-            <p class="card-text">
-                Average Power Consumed Per Unit of Time: @Math.Round(TotalTimePassed != 0 ? ((double)PowerConsumed / TotalTimePassed) : 0, 2)
-            </p>
-        </div>
-    </div>
-</div>
-<div class="card-columns">
-    <NewPassengerProbabilityCard @bind-Probability="NewPassengerProbability"
-                                 @bind-Probability:event="ProbabilityChanged" />
-    <div class="card mb-3">
-        <div class="card-body">
-            <p class="card-text">
-                Speed:<br />
-                @if (NormalSpeed)
-                {
-                    <button type="button" class="btn btn-primary" @onclick="ToggleSpeed">Normal Speed</button>
-                    <button type="button" class="btn btn-secondary" @onclick="ToggleSpeed">Full Speed</button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-secondary" @onclick="ToggleSpeed">Normal Speed</button>
-                    <button type="button" class="btn btn-danger" @onclick="ToggleSpeed">Full Speed</button>
-                }
-            </p>
-        </div>
-    </div>
-</div>
-
-<button class="btn btn-primary" @onclick="AddElevator">Add Elevator</button>
-
-<button class="btn btn-dark" @onclick="AddFloor">Add a Floor</button>
-
-@if (Floors.Count > 1)
-{
-    <button class="btn btn-dark" @onclick="RemoveFloor">Remove top Floor</button>
-}
-
-@if (Simulating)
-{
-    <button type="button" class="btn btn-warning" @onclick="SimulateToggle">Stop Simulation</button>
-}
-else
-{
-    <button type="button" class="btn btn-danger" @onclick="SimulateToggle">Start Simulation</button>
-}
-
-<br />
-<br />
-
-<div class="card text-white bg-success mb-3">
-    <div class="card-header">Fulfilled Passengers:</div>
-    <div class="card-body">
-        <p class="card-text">
-            <div class="card-columns">
-                @foreach (PassengerModel passenger in Passengers.Where(i => i.CurrentFloor == i.RequestedFloor))
-                {
-                    <Passenger PassengerModel="passenger" />
-                }
+<div class="row mb-3">
+    <div class="col-12">
+        @if (Simulating)
+        {
+            <div class="alert alert-warning mb-2">
+                <strong>Simulation Running</strong>
+                <div class="progress mt-2" style="height: 8px;">
+                    <div class="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                </div>
             </div>
-        </p>
+        }
+        else
+        {
+            <div class="alert alert-info mb-2">
+                <strong>Simulation Paused</strong>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4 col-sm-6 mb-2">
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">Passengers</small>
+                <h5 class="mb-0">@Passengers.Count</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-2">
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">Time Passed</small>
+                <h5 class="mb-0">@TotalTimePassed</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-2">
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">Total Wait Time</small>
+                <h5 class="mb-0">@Passengers.Sum(i => i.WaitTime)</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-2">
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">Power Consumed</small>
+                <h5 class="mb-0">@PowerConsumed</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-2">
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">Avg Wait Time</small>
+                <h5 class="mb-0">@Math.Round(Passengers.Count != 0 ? ((double)Passengers.Sum(i => i.WaitTime) / Passengers.Count) : 0, 2)</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-2">
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">Avg Power/Time</small>
+                <h5 class="mb-0">@Math.Round(TotalTimePassed != 0 ? ((double)PowerConsumed / TotalTimePassed) : 0, 2)</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6 mb-2">
+        <NewPassengerProbabilityCard @bind-Probability="NewPassengerProbability"
+                                     @bind-Probability:event="ProbabilityChanged" />
+    </div>
+    <div class="col-md-6 mb-2">
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted d-block mb-2">Speed</small>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn @(NormalSpeed ? "btn-primary" : "btn-outline-secondary")" @onclick="ToggleSpeed">Normal</button>
+                    <button type="button" class="btn @(!NormalSpeed ? "btn-danger" : "btn-outline-secondary")" @onclick="ToggleSpeed">Fast</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3">
+    <button class="btn btn-primary btn-sm" @onclick="AddElevator">
+        <span class="oi oi-plus"></span> Add Elevator
+    </button>
+    <button class="btn btn-secondary btn-sm" @onclick="AddFloor">
+        <span class="oi oi-plus"></span> Add Floor
+    </button>
+    @if (Floors.Count > 1)
+    {
+        <button class="btn btn-secondary btn-sm" @onclick="RemoveFloor">
+            <span class="oi oi-minus"></span> Remove Floor
+        </button>
+    }
+    @if (Simulating)
+    {
+        <button type="button" class="btn btn-warning btn-sm" @onclick="SimulateToggle">
+            <span class="oi oi-media-pause"></span> Stop
+        </button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-success btn-sm" @onclick="SimulateToggle">
+            <span class="oi oi-media-play"></span> Start
+        </button>
+    }
+</div>
+
+<div class="card bg-success text-white mb-3">
+    <div class="card-header py-2">
+        <strong>Fulfilled Passengers (@Passengers.Count(i => i.CurrentFloor == i.RequestedFloor))</strong>
+    </div>
+    <div class="card-body p-2">
+        <div class="row">
+            @foreach (PassengerModel passenger in Passengers.Where(i => i.CurrentFloor == i.RequestedFloor))
+            {
+                <div class="col-auto mb-2">
+                    <Passenger PassengerModel="passenger" />
+                </div>
+            }
+        </div>
     </div>
 </div>
 

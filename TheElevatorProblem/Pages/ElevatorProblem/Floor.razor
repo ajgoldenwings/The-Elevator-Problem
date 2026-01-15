@@ -1,31 +1,31 @@
 ﻿
-<div class="card-group">
-    <div class="card text-white bg-dark mb-2">
-        <div class="card-header">Floor @FloorModel.Id</div>
-        <div class="card-body">
-            <p class="card-text">
-                <div class="card-columns">
-                    @foreach (ElevatorModel elevator in Elevators)
-                    {
+<div class="card-group mb-3">
+    <div class="card text-white bg-dark">
+        <div class="card-header py-2">Floor @FloorModel.Id</div>
+        <div class="card-body p-2">
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (ElevatorModel elevator in Elevators)
+                {
+                    <div class="flex-shrink-0">
                         <Elevator Passengers="Passengers.Where(i => i.CurrentElevator == elevator).ToList()" 
                                   ElevatorModel="elevator" 
                                   DeleteElevator="DeleteElevator" />
-                    }
-                </div>
-            </p>
+                    </div>
+                }
+            </div>
         </div>
     </div>
-    <div class="card text-white bg-dark mb-2">
-        <div class="card-header">Waiting Passengers:</div>
-        <div class="card-body">
-            <p class="card-text">
-                <div class="card-columns">
-                    @foreach (PassengerModel passenger in Passengers.Where(i => i.CurrentElevator == null))
-                    {
+    <div class="card text-white bg-dark">
+        <div class="card-header py-2">Waiting Passengers</div>
+        <div class="card-body p-2">
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (PassengerModel passenger in Passengers.Where(i => i.CurrentElevator == null))
+                {
+                    <div class="flex-shrink-0" style="width: 180px;">
                         <Passenger PassengerModel="passenger" />
-                    }
-                </div>
-            </p>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>

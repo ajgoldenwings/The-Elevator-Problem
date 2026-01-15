@@ -5,6 +5,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+    background-color: #f8f9fa;
 }
 
 a, .btn-link {
@@ -12,9 +13,9 @@ a, .btn-link {
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 #app {
@@ -24,13 +25,107 @@ a, .btn-link {
     height: 100%;
 }
 
-.main {
-    flex: 1;
-    width: 100%;
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.content {
-    padding-top: 1.1rem;
+.header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.github-link {
+    color: white;
+    transition: opacity 0.2s;
+}
+
+.github-link:hover {
+    opacity: 0.8;
+}
+
+.main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 0;
+}
+
+.card {
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.card-body {
+    padding: 0.75rem;
+}
+
+.card-body h5 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.card-text {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.card-columns {
+    column-count: 3;
+    column-gap: 0.75rem;
+}
+
+@media (max-width: 992px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-columns {
+        column-count: 1;
+    }
+    
+    .header h1 {
+        font-size: 1.25rem;
+    }
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.gap-1 {
+    gap: 0.25rem;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.card-group {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.card-group > .card {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .card-group {
+        flex-direction: column;
+    }
 }
 
 .valid.modified:not([type=checkbox]) {
