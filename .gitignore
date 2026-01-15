@@ -27,3 +27,4 @@ bld/
 
 # Publish
 publish/
+.DS_Store
