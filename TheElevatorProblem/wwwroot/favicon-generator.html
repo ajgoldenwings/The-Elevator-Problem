@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favicon Generator</title>
+</head>
+<body>
+    <canvas id="canvas" width="32" height="32"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = '#667eea';
+        ctx.fillRect(0, 0, 32, 32);
+        
+        // Elevator shaft
+        ctx.fillStyle = '#764ba2';
+        ctx.fillRect(6, 3, 20, 26);
+        
+        // Elevator car
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(8, 12, 16, 15);
+        
+        // Door split
+        ctx.strokeStyle = '#333333';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(16, 12);
+        ctx.lineTo(16, 27);
+        ctx.stroke();
+        
+        // Up arrow
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(16, 6);
+        ctx.lineTo(13, 9);
+        ctx.lineTo(19, 9);
+        ctx.closePath();
+        ctx.fill();
+        
+        console.log('Favicon generated on canvas');
+    </script>
+</body>
+</html>

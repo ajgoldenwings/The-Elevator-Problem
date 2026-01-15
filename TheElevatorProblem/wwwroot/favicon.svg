@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Elevator shaft -->
+  <rect x="20" y="10" width="60" height="80" fill="#667eea" stroke="#764ba2" stroke-width="3" rx="5"/>
+  
+  <!-- Elevator car -->
+  <rect x="25" y="40" width="50" height="45" fill="#ffffff" stroke="#333" stroke-width="2" rx="3"/>
+  
+  <!-- Elevator door split -->
+  <line x1="50" y1="40" x2="50" y2="85" stroke="#333" stroke-width="2"/>
+  
+  <!-- Door handles -->
+  <circle cx="45" cy="62" r="2" fill="#333"/>
+  <circle cx="55" cy="62" r="2" fill="#333"/>
+  
+  <!-- Up arrow -->
+  <polygon points="50,20 45,28 55,28" fill="#ffffff"/>
+  
+  <!-- Down arrow -->
+  <polygon points="50,35 45,27 55,27" fill="#ffffff"/>
+  
+  <!-- Floor indicator lights -->
+  <circle cx="35" cy="25" r="2" fill="#ffd700"/>
+  <circle cx="65" cy="25" r="2" fill="#cccccc"/>
+</svg>
