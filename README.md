@@ -1,11 +1,38 @@
 # The Elevator Problem
 
-## Getting Started
-Mainly you must:
-1. Install the latest [.NET Core 3.0 Preview SDK](https://dotnet.microsoft.com/download/dotnet-core/3.0) release.
-1. Install the latest [Visual Studio preview](https://visualstudio.microsoft.com/vs/preview/) with the ASP.NET and web development workload.
+A Blazor Server application simulating elevator operations and passenger management.
 
-Or follow the [getting started documentation](https://docs.microsoft.com/en-us/aspnet/core/blazor/get-started?view=aspnetcore-3.0&tabs=visual-studio) to run this application
+## Prerequisites
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later
+
+## Getting Started
+
+### Running the Application
+
+1. Clone or download this repository
+2. Navigate to the project directory:
+   ```bash
+   cd TheElevatorProblem
+   ```
+3. Restore dependencies:
+   ```bash
+   dotnet restore
+   ```
+4. Run the application:
+   ```bash
+   dotnet run
+   ```
+5. Open your browser and navigate to:
+   - HTTPS: `https://localhost:5001`
+   - HTTP: `http://localhost:5000`
+
+### Building for Production
+
+```bash
+dotnet build -c Release
+dotnet publish -c Release -o ./publish
+```
 
 ## Overview
 - Main logic within TheElevatorProblem\Pages\ElevatorProblem\ElevatorProblem.razor
@@ -23,11 +50,19 @@ Or follow the [getting started documentation](https://docs.microsoft.com/en-us/a
 ![Elevator Simulation Picture 2](/picture2.png)
 
 ## Technical Challenges
-- May take time to respond to a requesting passenger. Currently it looks to see if there is at least one passenger that exists and sends on elevator per direction. Does not send multiple. Does not take into account for cost over time for power.
-- Not efficient if running large datasets.
-- Having a Task wait is unavailable within Blazor since Blazor's implementation for WASM does not allow it. I could be wrong.
-- As more components are rendered on screen, the slower it gets. Good for shorter demonstrations or fewer passengers.
+- May take time to respond to a requesting passenger. Currently it looks to see if there is at least one passenger that exists and sends one elevator per direction. Does not send multiple. Does not take into account cost over time for power.
+- Not efficient when running large datasets.
+- As more components are rendered on screen, the slower it gets. Best suited for shorter demonstrations or fewer passengers.
 
-## Missing
-- One requirement is to have the state of each button of the floor. A work around if needed is to check for passengers that are not in a current elevator and their current floor is not their requested floor. You can deduct the button they pressed buy the floor they are requesting relative to their current floor.
-- Another requirement missing is time elapsed since each floor-button pushed. This again would be easy to implement per max wait time of a requesting passenger per floor per direction.
+## Architecture
+
+- **Framework**: Blazor Server with .NET 10
+- **UI**: Bootstrap 5.3.2 (via CDN)
+- **Hosting Model**: Minimal hosting model (modern .NET pattern)
+- **Main Logic**: `TheElevatorProblem/Pages/ElevatorProblem/ElevatorProblem.razor`
+
+## Known Limitations
+
+- One requirement is to have the state of each button on the floor. A workaround: check for passengers not currently in an elevator where their current floor differs from their requested floor. You can deduce the button they pressed by the floor they are requesting relative to their current floor.
+- Another missing requirement is time elapsed since each floor button was pushed. This could be easily implemented by tracking max wait time of requesting passengers per floor per direction.
+
